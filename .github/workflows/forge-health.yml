@@ -1,0 +1,51 @@
+name: Forge Health
+
+on:
+  push:
+  pull_request:
+    branches: [dev]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  forge-health:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify DHF structure
+        run: |
+          required=(
+            "01_device_description/intended_use.md"
+            "01_device_description/software_classification.md"
+            "02_requirements/system_requirements.md"
+            "02_requirements/traceability_index.md"
+            "03_architecture/software_architecture.md"
+            "03_architecture/interfaces.md"
+            "04_risk_management/risk_management_plan.md"
+            "04_risk_management/hazard_analysis.md"
+            "04_risk_management/risk_control_measures.md"
+            "04_risk_management/residual_risk_evaluation.md"
+            "05_soup/soup_register.md"
+            "05_soup/soup_risk_analysis.md"
+            "06_verification/verification_plan.md"
+            "06_verification/evidence_index.md"
+            "07_configuration_management/cm_plan.md"
+            "08_security/threat_model.md"
+            "09_change_control/change_control_procedure.md"
+          )
+          missing=()
+          for f in "${required[@]}"; do
+            [[ ! -f "$f" ]] && missing+=("$f")
+          done
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "Missing required DHF files:"
+            printf '  %s\n' "${missing[@]}"
+            exit 1
+          fi
+          echo "All required DHF sections present."
