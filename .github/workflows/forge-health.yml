@@ -1,4 +1,4 @@
-name: Forge Health
+name: DHF Structure Check
 
 "on":
   push:
